@@ -16,8 +16,6 @@ schema.plugin(jsonform, {
 
 schema.plugin(injector, require('./injector'));
 
-require('./functions')(schema);
-
 exports.getSchema = function () {
     return schema;
 };

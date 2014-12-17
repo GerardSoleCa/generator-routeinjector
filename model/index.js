@@ -64,6 +64,7 @@ Generator.prototype.writeModel = function writeModel() {
 Generator.prototype.askForSchema = function askForSchema() {
     var cb = this.async();
     this.elements = {};
+    var thiz = this;
 
     var prompt = function () {
         this.prompt([{
@@ -84,14 +85,48 @@ Generator.prototype.askForSchema = function askForSchema() {
             type: 'list',
             name: 'type',
             message: '- Select element type',
-            choices: ['String', 'Number', '[String]', '[Number]', 'Date']
+            choices: function () {
+                var types = ['String', 'Number', 'Date', 'Mixed','Reference', 'String array', 'Number array', 'Date array', 'Reference array'];
+                return types;
+            }
+        }, {
+            when: function (response) {
+                var types = ['Embedded array', 'Reference', 'Reference array'];
+                return thiz._.contains(types, response.type);
+            },
+            type: 'input',
+            name: 'model',
+            message: '- Write the model to which this element points'
         }], function (response) {
             if (response.name && response.type) {
-                //this.elements.push({
-                //    name: response.name,
-                //    type: response.type
-                //});
-                this.elements[response.name] = response.type;
+                switch (response.type) {
+                    case 'String':
+                    case 'Number':
+                    case 'Date':
+                        this.elements[response.name] = response.type;
+                        break;
+                    case 'Mixed':
+                        this.elements[response.name] = {type: {}};
+                        break;
+                    case 'Reference':
+                        this.elements[response.name] = {type: 'ObjectId', ref: response.model};
+                        break;
+                    case 'String array':
+                        this.elements[response.name] = [String];
+                        break;
+                    case 'Number array':
+                        this.elements[response.name] = [Number];
+                        break;
+                    case 'Date array':
+                        this.elements[response.name] = [Date];
+                        break;
+                    case 'Embedded array':
+                        this.elements[response.name] = [response.model];
+                        break;
+                    case 'Reference array':
+                        this.elements[response.name] = [{type: 'ObjectId', ref: response.model}];
+                        break;
+                }
             }
             if (!response.addNew) {
                 cb();
