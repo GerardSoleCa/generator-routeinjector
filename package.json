@@ -1,0 +1,19 @@
+{
+  "name": "generator-routeinjector",
+  "version": "0.0.1",
+  "description": "A RouteInjector generator for yeoman",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "author": "Gerard Solé <g.sole.ca@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^0.4.0",
+    "stringify-object": "^1.0.0",
+    "wiredep": "^1.0.0",
+    "yeoman-generator": "^0.16.0",
+    "yosay": "^0.2.0"
+  }
+}

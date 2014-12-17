@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+var routeinjector = require('routeinjector');
+routeinjector.start();
