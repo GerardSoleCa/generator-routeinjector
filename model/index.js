@@ -4,6 +4,8 @@ var util = require('util');
 var yeoman = require('yeoman-generator');
 var stringifyObject = require('stringify-object');
 
+var Mustache = require('mustache');
+
 String.prototype.capitalize = function () {
     var s = this.toLowerCase();
     return s.charAt(0).toUpperCase() + s.slice(1);
@@ -66,6 +68,14 @@ Generator.prototype.askForSchema = function askForSchema() {
     this.elements = {};
     var thiz = this;
 
+    this.conversions = {
+        'String': 'String',
+        'Number': 'Number',
+        'Mixed': 'Mixed',
+        'Date': 'Date',
+        'ObjectId': 'ObjectId'
+    };
+
     var prompt = function () {
         this.prompt([{
             name: 'addNew',
@@ -83,48 +93,70 @@ Generator.prototype.askForSchema = function askForSchema() {
                 return (response.addNew && response.name != "" );
             },
             type: 'list',
-            name: 'type',
-            message: '- Select element type',
+            name: 'singularity',
+            message: '- Choice if you want a single element or an array',
             choices: function () {
-                var types = ['String', 'Number', 'Date', 'Mixed','Reference', 'String array', 'Number array', 'Date array', 'Reference array'];
-                return types;
+                //var types = ['Single', 'Array'];//String', 'Number', 'Date', 'Mixed','Reference', 'String array', 'Number array', 'Date array', 'Reference array'];
+                return ['Single', 'Array'];
             }
         }, {
             when: function (response) {
-                var types = ['Embedded array', 'Reference', 'Reference array'];
+                return (response.addNew && response.name != "" );
+            },
+            type: 'list',
+            name: 'type',
+            message: function (response) {
+                return '- You have selected ' + response.singularity + ', now choose the element type';
+            },
+            choices: function (response) {
+                var choiches = ['String', 'Number', 'Date', 'Mixed', 'Reference'];
+                if (response.singularity == 'Array')
+                    choiches.push('Embedded');
+                return choiches;
+            }
+        }, {
+            when: function (response) {
+                var types = ['Reference', 'Embedded'];
                 return thiz._.contains(types, response.type);
             },
             type: 'input',
             name: 'model',
             message: '- Write the model to which this element points'
         }], function (response) {
-            if (response.name && response.type) {
-                switch (response.type) {
-                    case 'String':
-                    case 'Number':
-                    case 'Date':
-                        this.elements[response.name] = response.type;
+            if (response.name && response.singularity && response.type) {
+                switch (response.singularity) {
+                    case'Single':
+                        switch (response.type) {
+                            case 'String':
+                            case 'Number':
+                            case 'Date':
+                                this.elements[response.name] = {type: '<%' + response.type + '%>'};
+                                break;
+                            case 'Mixed':
+                                this.elements[response.name] = {type: '<%Mixed%>'};
+                                break;
+                            case 'Reference':
+                                this.elements[response.name] = {type: '<%ObjectId%>', ref: response.model};
+                                break;
+                        }
                         break;
-                    case 'Mixed':
-                        this.elements[response.name] = {type: {}};
-                        break;
-                    case 'Reference':
-                        this.elements[response.name] = {type: 'ObjectId', ref: response.model};
-                        break;
-                    case 'String array':
-                        this.elements[response.name] = [String];
-                        break;
-                    case 'Number array':
-                        this.elements[response.name] = [Number];
-                        break;
-                    case 'Date array':
-                        this.elements[response.name] = [Date];
-                        break;
-                    case 'Embedded array':
-                        this.elements[response.name] = [response.model];
-                        break;
-                    case 'Reference array':
-                        this.elements[response.name] = [{type: 'ObjectId', ref: response.model}];
+                    case 'Array':
+                        switch (response.type) {
+                            case 'String':
+                            case 'Number':
+                            case 'Date':
+                                this.elements[response.name] = [{type: '<%' + response.type + '%>'}];
+                                break;
+                            case 'Mixed':
+                                this.elements[response.name] = [{type: '<%Mixed%>'}];
+                                break;
+                            case 'Reference':
+                                this.elements[response.name] = [{type: '<%ObjectId%>', ref: response.model}];
+                                break;
+                            case 'Embedded':
+                                this.conversions[response.model] = response.model;
+                                this.elements[response.name] = ['<%' + response.model + '%>']
+                        }
                         break;
                 }
             }
@@ -148,6 +180,13 @@ Generator.prototype.writeSchema = function writeSchema() {
     this.elements = stringifyObject(this.elements, {
         singleQuotes: true
     });
+
+    var template = "{{='<% %>'=}}" + this.elements + "'<%={{ }}=%>'";
+    console.log(template);
+    this.elements = Mustache.render(template, this.conversions);
+    console.log(this.elements);
+    //var Schema = mongooseGen._convert(this.elements);
+    //console.log('',this.elements);
 
     var thiz = this;
     this._.forEach(files, function (file) {

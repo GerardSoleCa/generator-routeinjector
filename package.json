@@ -11,9 +11,11 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^0.4.0",
+    "mongoose-gen": "0.0.3",
     "stringify-object": "^1.0.0",
     "wiredep": "^1.0.0",
     "yeoman-generator": "^0.16.0",
-    "yosay": "^0.2.0"
+    "yosay": "^0.2.0",
+    "mustache":"*"
   }
 }
