@@ -1,6 +1,6 @@
 module.exports = {
     database: {
-        endpoint: 'localhost',
+        endpoint: 'localhost:27017',
         name: "<%= _.slugify(appname) %>",
         debug: false
     },
@@ -11,5 +11,5 @@ module.exports = {
         path: __dirname + "/../image",
         cache: __dirname + "/../image/.cache"
     },
-    auth: true
+    auth: false
 };
