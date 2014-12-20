@@ -9,6 +9,7 @@
     "mongoose-injector": "http://147.83.113.200:1234/package/mongoose-injector/latest",
     "mongoose-jsonform": "http://147.83.113.200:1234/package/mongoose-jsonform/latest",
     "route-injector": "http://147.83.113.200:1234/package/route-injector/latest",
-    "statusCode": "http://147.83.113.200:1234/package/statusCode/latest"
+    "statusCode": "http://147.83.113.200:1234/package/statusCode/latest",
+    "<%= _.slugify(viewEngine) %>":"*"
   }
 }

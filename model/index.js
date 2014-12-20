@@ -182,11 +182,7 @@ Generator.prototype.writeSchema = function writeSchema() {
     });
 
     var template = "{{='<% %>'=}}" + this.elements + "'<%={{ }}=%>'";
-    console.log(template);
     this.elements = Mustache.render(template, this.conversions);
-    console.log(this.elements);
-    //var Schema = mongooseGen._convert(this.elements);
-    //console.log('',this.elements);
 
     var thiz = this;
     this._.forEach(files, function (file) {
