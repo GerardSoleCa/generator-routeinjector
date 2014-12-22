@@ -3,7 +3,7 @@ generator-routeinjector
 
 Install the generator globally:
 ```sh
-$ npm -g install yo generator-routeinjector
+$ npm -g install yo GerardSoleCa/generator-routeinjector
 ```
 
 Scaffold a new application:
